@@ -48,6 +48,7 @@ class LRL_LatticeMatcher {
 public:
    LRL_LatticeMatcher( );
    void SetReferenceLattice( const MV_Pair& mvp );
+   void SetReferenceLattice( const S6& s ); // for distance calculation
    S6 GetReference( ) const { return m_reducedReference; };
    S6 MatchReference( const S6& s ) const;
    std::vector<S6> MatchReference( const std::vector<S6>& vs ) const;
@@ -59,7 +60,7 @@ public:
 
 protected: // functions
    void BuildReferenceTree( const S6& s );
-   std::vector<MatS6> LRL_LatticeMatcher::DoThreeAxes( );
+   std::vector<MatS6> DoThreeAxes( );
    void StoreMV_IfUnique( const S6& s, const MatS6& m );
    void FillReflections( );
    void StoreMatS6IfUnique( const MatS6& m );
@@ -78,6 +79,7 @@ public:
    LMDist() {}
    LMDist( const S6& s );
    double DistanceBetween( const S6& s2 );
+   double DistanceBetween( const S6& s1, const S6& s2 );
 };
 
 #endif  //  LRL_LATTICEMATCHER_H

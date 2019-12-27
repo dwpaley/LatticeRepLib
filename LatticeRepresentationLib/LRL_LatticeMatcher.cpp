@@ -69,13 +69,17 @@ void LRL_LatticeMatcher::BuildMatrixTree( void ) {
 }
 
 void LRL_LatticeMatcher::SetReferenceLattice( const MV_Pair& mpReducedReference ) {
-   if (!m_MVtree.empty( ))
-      m_MVtree.clear( );
+   if ((m_reducedReference - mpReducedReference.GetS6()).norm( ) < 1.0E-4) return;
+   m_MVtree.clear( );
    m_reducedReference = mpReducedReference.GetS6();
    m_matReference = mpReducedReference.GetMatS6( );
    BuildReferenceTree( m_reducedReference );
 }
 
+void LRL_LatticeMatcher::SetReferenceLattice( const S6& s) {
+   if ((s - m_reducedReference).norm( ) < 1.0E-4) return;
+   SetReferenceLattice( MV_Pair( s, MatS6( ).unit( ) ) );
+}
 
 void LRL_LatticeMatcher::BuildReferenceTree( const S6& s) {
    const double normReference = m_reducedReference.norm( );
@@ -105,7 +109,8 @@ double LRL_LatticeMatcher::DistanceBetween( const S6& s1, const S6& s2 ) {
 S6 LRL_LatticeMatcher::MatchReference( const S6& s ) const {
    const static bool debug = false;
    MV_Pair closest;
-   const bool b = m_MVtree.NearestNeighbor( DBL_MAX, closest, MV_Pair(s, MatS6()) );
+   Scaler_MV scale( m_reducedReference );
+   const bool b = m_MVtree.NearestNeighbor( DBL_MAX, closest, MV_Pair(scale.Scale(s), MatS6()) );
    if (!b) throw;
 
    const double d = (closest.GetMatS6()*s - m_reducedReference).norm( );
@@ -116,7 +121,8 @@ S6 LRL_LatticeMatcher::MatchReference( const S6& s ) const {
    std::vector<MV_Pair> vClosest;
    S6 s6closest;
    double dmin_G6 = DBL_MAX;
-   const long n = m_MVtree.FindInSphere( 1.01 * d +0.1, vClosest, closest );
+   const long n = m_MVtree.FindInSphere( 1.0 * d +0.1, vClosest, closest );
+   std::cout << "m_MV_Tree vClosest.size() " << vClosest.size( ) << std::endl;
    if ( n >= 1 ) {
       for ( size_t i=0; i<n; ++i ) {
          const S6 s6test = vClosest[i].GetMatS6( ) * s;
@@ -178,16 +184,25 @@ std::ostream& operator<< ( std::ostream& o, const MV_Pair& v ) {
 }
 
 LMDist::LMDist( const S6& s ) {
-   const bool b = Selling::Reduce( s, m_reducedReference );
-   SetReferenceLattice( MV_Pair( m_reducedReference, MatS6( ).unit( ) ) );
+   SetReferenceLattice( MV_Pair( s, MatS6( ).unit( ) ) );
    m_MVtree.clear( );
    BuildMatrixTree( );
    BuildReferenceTree( m_reducedReference );
 }
 
 double LMDist::DistanceBetween( const S6& s2 ) {
-   S6 sRed;
-   bool b = Selling::Reduce( s2, sRed );
-   const S6 matched = MatchReference( sRed );
+   const S6 matched = MatchReference( s2 );
    return (m_reducedReference - matched).norm( );
+}
+
+double LMDist::DistanceBetween( const S6& s1, const S6& s2 ) {
+   SetReferenceLattice( s1 );
+   const S6 matched = MatchReference( s2 );
+   const double dist = (m_reducedReference - matched).norm( );
+   //std::cout << "in LMDist::DistanceBetween " << dist << std::endl 
+   //   << " " << C3(s1) << std::endl
+   //   << " " << C3(s2) << std::endl
+   //   << " " << C3(m_reducedReference) << std::endl
+   //   << " " << C3(matched) << std::endl << std::endl;
+   return dist;
 }
