@@ -3,7 +3,7 @@
 
 #include "LRL_Cell.h"
 #include "D7_ClassifySubboundaries.h"
-#include "D7_Boundary.h"
+#include "D7_boundary.h"
 #include "D7_BoundaryList.h"
 #include "Delone.h"
 #include "MatS6.h"

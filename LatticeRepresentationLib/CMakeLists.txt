@@ -1,4 +1,5 @@
 set(PROJECT_NAME LatticeRepresentationLib)
+set(CMAKE_CXX_STANDARD 11)
 project(${PROJECT_NAME} CXX)
 
 ################################################################################
@@ -11,12 +12,13 @@ set(HEADERS_FILES
     CellInputData.h
     CS6Dist.h
     D7.h
-    D7_Boundary.h
+    D7_boundary.h
     D7_BoundaryList.h
     D7_ClassifySubboundaries.h
     D7_Subboundary.h
     D7Dist.h
     D7Dist_.hpp
+    DC.h
     Delone.h
     G6.h
     GenerateRandomLattice.h
@@ -55,12 +57,15 @@ set(SRC_FILES
     D7_ClassifySubboundaries.cpp
     D7_Subboundary.cpp
     D7Dist.c
+    DC.cpp
     Delone.cpp
     G6.cpp
     LatticeConverter.cpp
     LRL_Cell.cpp
     LRL_Cell_Degrees.cpp
+    LRL_CoordinateConversionMatrices.cpp
     LRL_CreateFileName.cpp
+    LRL_LatticeMatcher.cpp
     LRL_ReadLatticeData.cpp
     MatB4.cpp
     MatD7.cpp
@@ -89,67 +94,45 @@ endif()
 ################################################################################
 # Output directory
 ################################################################################
-if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-    string(CONCAT OUT_DIR
-        $<$<CONFIG:Release>:${CMAKE_SOURCE_DIR}/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/>
-          $<$<CONFIG:Debug>:${CMAKE_SOURCE_DIR}/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/>
-        $<$<NOT:$<OR:$<CONFIG:Release>,$<CONFIG:Debug>>>:${CMAKE_SOURCE_DIR}/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>>
-    )
-endif()
+string(CONCAT OUT_DIR
+    $<$<CONFIG:Release>:${CMAKE_SOURCE_DIR}/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/>
+      $<$<CONFIG:Debug>:${CMAKE_SOURCE_DIR}/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/>
+    $<$<NOT:$<OR:$<CONFIG:Release>,$<CONFIG:Debug>>>:${CMAKE_SOURCE_DIR}/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>>
+)
 set_target_properties(${PROJECT_NAME} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${OUT_DIR}")
 set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${OUT_DIR}")
 
 ################################################################################
 # Target name
 ################################################################################
-if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-    string(CONCAT TARGET_NAME
-        $<$<CONFIG:Release>:${PROJECT_NAME}>
-          $<$<CONFIG:Debug>:${PROJECT_NAME}>
-        $<$<NOT:$<OR:$<CONFIG:Release>,$<CONFIG:Debug>>>:${PROJECT_NAME}>
-    )
-endif()
+string(CONCAT TARGET_NAME
+    $<$<CONFIG:Release>:${PROJECT_NAME}>
+      $<$<CONFIG:Debug>:${PROJECT_NAME}>
+    $<$<NOT:$<OR:$<CONFIG:Release>,$<CONFIG:Debug>>>:${PROJECT_NAME}>
+)
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${TARGET_NAME}")
 
 ################################################################################
 # Include directories
 ################################################################################
-if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-    target_include_directories(${PROJECT_NAME} PRIVATE 
-        $<$<CONFIG:Release>:${CMAKE_CURRENT_SOURCE_DIR}/../LRL_Tools>
-          $<$<CONFIG:Debug>:${CMAKE_CURRENT_SOURCE_DIR}/../LRL_Tools>
-    )
-endif()
+target_include_directories(${PROJECT_NAME} PRIVATE 
+    $<$<CONFIG:Release>:${CMAKE_CURRENT_SOURCE_DIR}/../LRL_Tools>
+      $<$<CONFIG:Debug>:${CMAKE_CURRENT_SOURCE_DIR}/../LRL_Tools>
+)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../LRL_Tools)
 
 ################################################################################
 # Compile definitions
 ################################################################################
-if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-    target_compile_definitions(${PROJECT_NAME} PRIVATE
-        $<$<CONFIG:Release>:NDEBUG;_CONSOLE;UNICODE;_UNICODE>
-          $<$<CONFIG:Debug>:_DEBUG;_CONSOLE;UNICODE;_UNICODE>
-    )
-endif()
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    $<$<CONFIG:Release>:NDEBUG;_CONSOLE;UNICODE;_UNICODE>
+      $<$<CONFIG:Debug>:_DEBUG;_CONSOLE;UNICODE;_UNICODE>
+)
 
 ################################################################################
 # Compile and link options
 ################################################################################
-if(MSVC)
-    if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-        target_compile_options(${PROJECT_NAME} PRIVATE
-            $<$<CONFIG:Release>:/GL;/O2;/Oi;/MD;/Gy;/W4;/fp:precise;/EHsc;/GS;/diagnostics:classic;/Zc:wchar_t;/Zc:forScope;/Zc:inline>
-              $<$<CONFIG:Debug>:/Od;/MDd;/W4;/fp:precise;/EHsc;/GS;/diagnostics:classic;/Zc:wchar_t;/Zc:forScope;/Zc:inline>
-        )
-    endif()
-endif()
-
-################################################################################
-# Dependencies
-################################################################################
-add_dependencies(${PROJECT_NAME} LRL_Tools)
-
-# Link with other targets.
-target_link_libraries(${PROJECT_NAME} LRL_Tools)
-
-
+target_compile_options(${PROJECT_NAME} PRIVATE
+    $<$<CONFIG:Release>:/GL;/O2;/Oi;/MD;/Gy;/W4;/fp:precise;/EHsc;/GS;/diagnostics:classic;/Zc:wchar_t;/Zc:forScope;/Zc:inline>
+      $<$<CONFIG:Debug>:/Od;/MDd;/W4;/fp:precise;/EHsc;/GS;/diagnostics:classic;/Zc:wchar_t;/Zc:forScope;/Zc:inline>
+)
