@@ -339,7 +339,7 @@ void LRL_LatticeMatcher::StoreMV_IfUnique( const S6& s, const MatS6& m ) {
 MV_Pair MV_Pair::CleanZeros( const MV_Pair& mv ) {
    MV_Pair t( mv );
    for (size_t i = 0; i < 6; ++i)
-      t.m_s6[i] = (abs( mv.m_s6[i] ) < 1.0E-10) ? 0.0 : t.m_s6[i];
+      t.m_s6[i] = (std::abs( mv.m_s6[i] ) < 1.0E-10) ? 0.0 : t.m_s6[i];
    return t;
 }
 
