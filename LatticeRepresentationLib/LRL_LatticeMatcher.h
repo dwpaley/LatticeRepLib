@@ -90,6 +90,7 @@ protected: // functions
 
 
 protected: // member data
+   std::set<MatS6> m_storedMatrices;
    CNearTree<MV_Pair> m_MVtree;
    CNearTree<MatS6> m_matrixTree;
    S6 m_reducedReference;

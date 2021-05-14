@@ -263,6 +263,15 @@ bool MatS6::operator== (const MatS6& m) const {
    return true;
 }
 
+
+bool MatS6::operator< (const MatS6& m) const {
+  for (int i=0; i<m_mat.size(); ++i) {
+    if (m_mat[i] < m.m_mat[i]) return true;
+    if (m_mat[i] > m.m_mat[i]) return false;
+  }
+  return false;
+}
+
 bool MatS6::operator!= (const MatS6& m) const {
    return !((*this) == m);
 }

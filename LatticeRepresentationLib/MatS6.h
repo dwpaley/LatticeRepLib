@@ -51,6 +51,7 @@ public:
    MatS6& operator-= (const MatS6& d);
    bool operator== (const MatS6& m) const;
    bool operator!= (const MatS6& m) const;
+   bool operator< (const MatS6& m) const;
    MatS6& operator*= (const double d);
    MatS6& operator/= (const double d);
 

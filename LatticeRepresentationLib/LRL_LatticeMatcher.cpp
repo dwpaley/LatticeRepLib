@@ -110,8 +110,9 @@ void LRL_LatticeMatcher::FillReflections( ) {
 }
 
 bool LRL_LatticeMatcher::StoreMatS6IfUnique( const MatS6& m) {
-   if (m_matrixTree.NearestNeighbor(dcutoff, m) == m_matrixTree.end()) {
+   if (m_storedMatrices.find(m) == m_storedMatrices.end()) {
       m_matrixTree.insert(m);
+      m_storedMatrices.insert(m);
       if ((m_matrixTree.size() % 1000) == 0) std::cout << " tree size " << m_matrixTree.size() << std::endl;
       return true;
    }
