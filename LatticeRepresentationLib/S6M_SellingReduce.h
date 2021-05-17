@@ -1719,7 +1719,7 @@
 
 
   #define CS6M_S6Reduce(in,out,reduced) {      \
-    size_t maxIndex       ;                  \
+    std::size_t maxIndex       ;                  \
     int reductionCycleCount;                 \
     int reduction;                           \
     int ii;                                  \

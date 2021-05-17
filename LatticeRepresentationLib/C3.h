@@ -281,8 +281,10 @@ private:
    static std::complex<double> Zero(const std::complex<double>& in);
 };
 
+/*
 class MatC3 : public LRL_MatrixBase<D7, MatC3> {
 
 };
+*/
 
 #endif // C3_H
